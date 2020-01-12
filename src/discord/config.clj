@@ -63,3 +63,7 @@
 (defn get-token
   ([] (get-token global-bot-settings))
   ([filename] (:token (file-io filename :load))))
+
+(defn get-id
+  ([] (get-id global-bot-settings))
+  ([filename] (:client-id (file-io filename :load))))

@@ -3,7 +3,8 @@
             [taoensso.timbre :as timbre]
             [discord.gateway :refer [Gateway] :as gw]
             [discord.http :as http]
-            [discord.types :refer [Authenticated] :as types]))
+            [discord.types :refer [Authenticated] :as types]
+            [discord.config :as config]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Representing a Discord client connected to the Discord server
@@ -62,7 +63,9 @@
      ;; Read messages coming from the server and pass them to the handler
      (go-loop []
        (when-let [message (<! recv-chan)]
-         (if (-> message :author :bot? not)
+         (if (or (-> message :author :bot? not)
+                 (when-let [id (config/get-id)]
+                   (-> message :author :id (not= id))))
            (try
              (message-handler client message)
              (catch Exception e (timbre/errorf "Error handling message: %s" e))))
